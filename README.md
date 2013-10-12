@@ -21,3 +21,5 @@ filters etc..
 
 
 EDIT made by admin joseca!!
+
+This is really made by JOSE!!

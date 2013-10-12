@@ -16,10 +16,3 @@ sine wave generators
 filters etc..
 
 
-
-/////////////////////Experimental edit!!//hope this works.......
-
-
-EDIT made by admin joseca!!
-
-This is really made by JOSE!!

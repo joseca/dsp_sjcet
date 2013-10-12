@@ -1,4 +1,16 @@
 dsp_sjcet
 =========
 
-DSP library in C
+DSP library in C.
+This library contains functions like
+
+FFT
+DFT
+
+Reading a wav file,
+playback of wav file,
+
+
+sine wave generators
+
+filters etc..

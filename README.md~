@@ -14,3 +14,7 @@ playback of wav file,
 sine wave generators
 
 filters etc..
+
+
+
+/////////////////////Experimental edit!!//hope this works.......

@@ -1,29 +1,43 @@
+
+
+// TO COMPILE >>>  gcc fft_read_from_file.c -o fft_read_from_file.o -lm
+// TO RUN    >>>  ./fft_read_from_file.o
+// Make sure you have the input.txt file on the same directory..
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "complex.h"
+#include "complex.h"       //This header is required for complex numbers
 
 #define pi 3.1415926535897932384
 
-void write_Complex_output_to_file(double _Complex *input);
+
+//functions for Reading from file and writing to file
 double _Complex * read_Complex_input_from_file();
+void write_Complex_output_to_file(double _Complex *input);
+
+//functions for DFT & DIT-FFT
 double _Complex * calculate_DFT(double _Complex *input);
 double _Complex * calculate_FFT(double _Complex *input);
+
+//function for performing BIT-Reversal (reqd. at i/p stage of FFT)
 unsigned int reverseIntNBits(unsigned num,int bits) ;
 
+/*we will be calculating 'N' point DFT/FFT..
+N should be a power of 2 like 2,4,8,16,32 ..etc
+This value of N is obtained from the input file..
+**/
+int N;
 
-int N=0;
 
 
 int main()
 {
 
-
-
-
 char input_file_name[]="input.txt";
 char output_file_name[]="output.txt";
+
 int i;
 double _Complex *input=read_Complex_input_from_file();
    for(i=0;i<N;i++)
@@ -224,7 +238,7 @@ double _Complex * read_Complex_input_from_file()
 	double _Complex *input;
 	
 	//initialize the file pointers..
-	FILE* inFileFp = fopen("input.txt", "r");
+	FILE* inFileFp = fopen(input_file_name, "r");
 	
 	if(!inFileFp)
 	 {

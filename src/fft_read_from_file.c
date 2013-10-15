@@ -1,3 +1,9 @@
+
+
+// TO COMPILE >>>  gcc fft_read_from_file.c -o fft_read_from_file.o -lm
+// TO RUN    >>>  ./fft_read_from_file.o
+// Make sure you have the input.txt file on the same directory..
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,7 +39,7 @@ char input_file_name[]="input.txt";
 char output_file_name[]="output.txt";
 
 int i;
-double _Complex *input=read_Complex_input_from_file();
+double _Complex *input=read_Complex_input_from_file(	);
    for(i=0;i<N;i++)
     {
          printf("\n%f + %fj",creal(input[i]),cimag(input[i]));

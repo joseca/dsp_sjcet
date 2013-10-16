@@ -4,6 +4,8 @@
 // TO RUN    >>>  ./fft_read_from_file.o
 // Make sure you have the input.txt file on the same directory..
 
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,8 +16,8 @@
 
 
 //functions for Reading from file and writing to file
-double _Complex * read_Complex_input_from_file();
-void write_Complex_output_to_file(double _Complex *input);
+double _Complex * read_Complex_input_from_file(char input_file_name[]);
+void write_Complex_output_to_file(char output_file_name[],double _Complex *input);
 
 //functions for DFT & DIT-FFT
 double _Complex * calculate_DFT(double _Complex *input);
@@ -35,33 +37,36 @@ int N;
 int main()
 {
 
+//EDIT here to change filenames
 char input_file_name[]="input.txt";
 char output_file_name[]="output.txt";
 
 int i;
-double _Complex *input=read_Complex_input_from_file();
+double _Complex *input=read_Complex_input_from_file(input_file_name);
    for(i=0;i<N;i++)
     {
-         printf("\n%f + %fj",creal(input[i]),cimag(input[i]));
+         //printf("\n%f + %fj",creal(input[i]),cimag(input[i]));
 
     }
 
 double _Complex *output_of_DFT=calculate_DFT(input);
 double _Complex *output_of_FFT=calculate_FFT(input);
 
+printf("finished Calculations..writing to file..\n");
 
+//EDIT here if you want DFT OR FFT output written..
+write_Complex_output_to_file(output_file_name,output_of_FFT);
 
-write_Complex_output_to_file(output_of_DFT);
 return 0;
 }
 
 
-void write_Complex_output_to_file(double _Complex *input)
+void write_Complex_output_to_file(char input_file_name[],double _Complex *input)
 {
 
 int i=0;
 
-FILE* outFileFp = fopen("output.txt", "w");
+FILE* outFileFp = fopen(input_file_name, "w");
     for(i=0;i<N;i++)
     {
         fprintf(outFileFp,"%f,%f\n",creal(input[i]),cimag(input[i]));
@@ -71,38 +76,44 @@ FILE* outFileFp = fopen("output.txt", "w");
 
 }
 
+
+//function to calculate the DFT of the input
 double _Complex* calculate_DFT(double _Complex *input)
 {
 
 
 double _Complex X[N];
-double _Complex *Y=malloc(sizeof(double)*N*2);  //each complex double has double*2 mem requirement!
-
-
+double _Complex *Y=malloc(sizeof(double)*N*2);  //each complex double has a real and imag part..
 int i,j,cmplx_multiplication_counter=0;
-printf("starting DFT...\n\n");
+printf("\nstarting DFT...\n\n");
 
+//transfer the input to X[N]
 for(i=0;i<N;i++)
 {
 X[i]=input[i];
-printf("%f + i%f \n",creal(X[i]),cimag(X[i]));
+//printf("%f + i%f \n",creal(X[i]),cimag(X[i]));
 
 }
+
+//This is the DFT calculation loop
+
 for(i=0;i<N;i++)
-		{ Y[i]=0;
-		 for(j=0;j<N;j++)
-		  {
-		    Y[i]=Y[i]+X[j]*(cos(2*pi*i*j/N)-_Complex_I*(sin(2*pi*i*j/N)));
-			
+{ 
+ Y[i]=0;
+ for(j=0;j<N;j++)
+  {
+   Y[i]=Y[i]+X[j]*(cos(2*pi*i*j/N)-_Complex_I*(sin(2*pi*i*j/N)));			
+   cmplx_multiplication_counter++;
+  }
+}
 
-cmplx_multiplication_counter++;
-		    	
-		  }
+printf("\nThe number of complex multiplications for this %d point DFT is %d\n",N,cmplx_multiplication_counter);
+printf("Finished DFT...\n\n");
 
-                }
 
-printf("\nThe number of complex multiplications for this %d point DFT is %d",N,cmplx_multiplication_counter);
-
+/* Now, Return the result back.. (since Y[N] has been allocated memory using malloc
+ * the contents will be intact)
+ */
 
 return Y;
 
@@ -110,6 +121,7 @@ return Y;
 
 
 
+//This is the function that calculates the FFT of the input
 double _Complex * calculate_FFT(double _Complex *input)
 {
 
@@ -118,29 +130,33 @@ double _Complex X[N];
 double _Complex *Y=malloc(sizeof(double)*N*2);  //each complex double has double*2 mem requirement!
 
 int i,j,cmplx_multiplication_counter=0;
-printf("starting FFT...\n\n");
+printf("Starting FFT...\n\n");
 printf("Bit Reversal starting...\n");
 
 for(i=0;i<N;i++)
-{
-X[i]=input[i];
-printf("%f + i%f \n",creal(X[i]),cimag(X[i]));
+ {
+  X[i]=input[i];
+  //printf("%f + i%f \n",creal(X[i]),cimag(X[i]));
+ }
 
-}
 
-   for(i=0;i<N;i++){
-        printf("\n%d<=>%d",i,reverseIntNBits(i,log2(N) ));
-    }
+//just priting the bit reversal order
+for(i=0;i<N;i++)
+ {
+  printf("\n%d<=>%d",i,reverseIntNBits(i,log2(N) ));
+ }
  
 
-double _Complex bit_reversed_X[N];
-for(i=0;i<N;i++){
-       
-        bit_reversed_X[i]=X[reverseIntNBits(i,log2(N))];
-        
-    }
+
+double _Complex bit_reversed_X[N]; //the variable where we store the bit reversed input
+
+
+for(i=0;i<N;i++)
+ {
+  bit_reversed_X[i]=X[reverseIntNBits(i,log2(N))];      
+ }
     	
-printf("After Bit Reversal...\n");
+printf("\nAfter Bit Reversal...The i/p is : \n");
 
 for(i=0;i<N;i++)
 {
@@ -154,7 +170,7 @@ double _Complex TEMP;
 double _Complex W_N;
 double _Complex W_n;
 W_N=cos(pi*2/N)-_Complex_I*sin(pi*2/N);
-printf("The value of twiddle factor is %f + i%f : \n",creal(W_N),cimag(W_N));
+printf("The value of twiddle factor^1 (W_N) is %f + i%f : \n",creal(W_N),cimag(W_N));
 number_of_stages=log2(N);
 
 
@@ -184,7 +200,7 @@ for(i=1;i<=number_of_stages;i++)
 	//set parameter
 	W_n=cpow(W_N,l);
 	printf("\n The twiddle factor k: : %d ....",l);
-	printf("\n The twiddle factor value: : %f +i%f ....",creal(W_n),cimag(W_n));
+	printf("\n The twiddle factor value:(W_N^%d) : %f +i%f ....",k,creal(W_n),cimag(W_n));
 	
 	
 	for(k=j;k<N;k=k+grouping_unit) //same parameter
@@ -215,8 +231,9 @@ for(i=1;i<=number_of_stages;i++)
 
 
 
-printf("\nThe number of complex multiplications for this %d point FFT is %d",N,cmplx_multiplication_counter);
+printf("\nThe number of complex multiplications for this %d point FFT is %d\n",N,cmplx_multiplication_counter);
 
+printf("Finished FFT...\n");
 
 
 for(i=0;i<N;i++)
@@ -231,7 +248,7 @@ return Y;
 
 
 
-double _Complex * read_Complex_input_from_file()
+double _Complex * read_Complex_input_from_file(char input_file_name[])
 {
 	
 	
@@ -242,7 +259,7 @@ double _Complex * read_Complex_input_from_file()
 	
 	if(!inFileFp)
 	 {
-	  printf("Input file missing!!..");
+	  printf("\n\nInput file missing!!..exiting..\n\n");
 	  exit(0);
 	 }
     	
@@ -262,7 +279,7 @@ double _Complex * read_Complex_input_from_file()
 	 }
 	
 	N=count;
-	printf("\nThe number of inputs is %d",count);
+	printf("\nThe number of inputs is: %d",count);
 	
 		
 	//allocate memory for getting in the input data into real and imaginary parts..
@@ -320,7 +337,7 @@ double _Complex * read_Complex_input_from_file()
 
 
 
-
+//function to reverse the bits with a N bit representation
 
 unsigned int reverseIntNBits(unsigned num,int bits) 
 {
